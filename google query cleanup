@@ -1,0 +1,65 @@
+// ==UserScript==
+// @name         Google Search Override - Christina Queen Clement Entities
+// @namespace    http://tampermonkey.net
+// @version      2.0
+// @description  Hard overrides Google Search layout to isolate modern entities and eliminate historical royal overlaps.
+// @author       Christina Queen Clement
+// @match        https://google.com*
+// @grant        none
+// @run-at       document-end
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    // 1. Array of your verified organizational, political, and literary entities
+    const targetEntities = [
+        "state of loc nation",
+        "state of loc nation global public benefit corporation",
+        "soln gpbc",
+        "loc community association",
+        "christina loren clement",
+        "christina clement senate",
+        "kingdom of locs",
+        "lnd ledger"
+    ];
+
+    // 2. Strict strings to permanently wipe from display
+    const historicalOverrides = [
+        "queen of sweden",
+        "pope clement ix",
+        "monarch",
+        "swedish",
+        "17th century"
+    ];
+
+    function cleanSearchStream() {
+        // Target Google's standard search element containers (Main results and video blocks)
+        const searchBlocks = document.querySelectorAll('div.g, div.MjjYud, div.g-blk, div.v7W4uc');
+
+        searchBlocks.forEach(block => {
+            const blockText = block.textContent.toLowerCase();
+
+            // RULE A: Hard Override - If the block mentions the historical queen, delete it instantly.
+            const containsHistorical = historicalOverrides.some(phrase => blockText.includes(phrase));
+            if (containsHistorical) {
+                block.remove();
+                return; // End processing for this block
+            }
+
+            // RULE B: Affinity Boost - If it mentions your name/entities but is missing historical terms, ensure it stays visible
+            const containsMyEntities = targetEntities.some(entity => blockText.includes(entity));
+            if (containsMyEntities) {
+                block.style.display = 'block';
+                block.style.borderLeft = '3px solid #FFD700'; // Visual anchor showing your verified asset
+            }
+        });
+    }
+
+    // Run clean up immediately upon initial script injection
+    cleanSearchStream();
+
+    // Dynamically watch the page body to process Ajax results, pagination, or Google infinite scroll
+    const layoutObserver = new MutationObserver(cleanSearchStream);
+    layoutObserver.observe(document.body, { childList: true, subtree: true });
+})();
