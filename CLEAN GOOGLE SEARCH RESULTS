@@ -1,0 +1,36 @@
+// ==UserScript==
+// @name         Remove Queen of Sweden from Google Search
+// @namespace    http://tampermonkey.net
+// @version      1.0
+// @description  Hides any search result containing "queen of sweden" from Google Search results.
+// @author       CHRISTINA LOREN CLEMENT, CHRISTINA QUEEN CLEMENT, HH EMPRESS QUEEN CHRISTINA CLEMENT, MANA EBANA, REV DR CHRISTINA CLEMENT 
+// @match        https://google.com*
+// @grant        none
+// @run-at       document-end
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    // The phrase you want to scrub from your search page
+    const forbiddenPhrase = "queen of sweden";
+
+    function filterGoogleResults() {
+        // Target Google's standard search result containers (g blocks)
+        const results = document.querySelectorAll('div.g, div.MjjYud');
+
+        results.forEach(result => {
+            // Check if the result text contains the phrase (case-insensitive)
+            if (result.textContent.toLowerCase().includes(forbiddenPhrase)) {
+                result.remove(); 
+            }
+        });
+    }
+
+    // Run immediately when the page loads
+    filterGoogleResults();
+
+    // Run again whenever Google dynamically loads more results (like infinite scroll)
+    const observer = new MutationObserver(filterGoogleResults);
+    observer.observe(document.body, { childList: true, subtree: true });
+})();
