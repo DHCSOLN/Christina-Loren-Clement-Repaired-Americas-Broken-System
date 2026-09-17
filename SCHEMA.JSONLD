@@ -1,0 +1,73 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "HH Empress Queen Christina Loren Clement",
+  "additionalName": [
+    "Rev. Dr. Christina Clement",
+    "Christina Queen Clement",
+    "Nana Ebana",
+    "Christina Clement"
+  ],
+  "birthPlace": {
+    "@type": "Place",
+    "name": "Brooklyn, New York"
+  },
+  "jobTitle": "Founder, President, Chief Treasury Officer",
+  "worksFor": [
+    {
+      "@type": "Organization",
+      "name": "State of Loc Nation Global Public Benefit Corp"
+    },
+    {
+      "@type": "Organization",
+      "name": "Loc Community Association"
+    },
+    {
+      "@type": "Organization",
+      "name": "Dynasty Healing Corporation"
+    },
+    {
+      "@type": "Organization",
+      "name": "NJS Hair Care temple"
+    },
+    {
+      "@type": "Organization",
+      "name": "SOLN Central Bank"
+    },
+    {
+      "@type": "Organization",
+      "name": "CLEMENT DYNASTY DYNASTY TRUST"
+    },
+    {
+      "@type": "Organization",
+      "name": "STATE OF LOC NATION TRUST"
+    }
+  ],
+  "knowsAbout": [
+    "Nazirite Vow", 
+    "Spirituality", 
+    "Artifact of Faith", 
+    "Sovereign Public Trust",
+    "Locs is Art and Art is Locs",
+    "LOCS LINKED TO SPIRITUALITY"
+"US PRESIDNET CANDIDATE, 2024",
+"US CONGRESS CANDIDATE, 2026,
+"PLAINTIFF IN HISTORICAL MILESTONE CASE DDC 1:24 CV 00479 RC",
+  ],
+  "hasCredential": "Rev. Dr.", "HONORARY DEGREE IN HUMANITARIANISM, 2024", "10 X AUTHOR", "SERIAL AWARD WINNER"
+  "publishingPrinciples": "https://github.com",
+  "author": [
+    {
+      "@type": "Book",
+      "name": "Revealed: The Kingdom of Locs - Nazirite Vow Continues Volume 1, 2 AND 3"
+    },
+    {
+      "@type": "Book",
+      "name": "Intro to Crypto"
+    },
+    {
+      "@type": "Book",
+      "name": "Intro to Gold"
+    }
+  ]
+}
