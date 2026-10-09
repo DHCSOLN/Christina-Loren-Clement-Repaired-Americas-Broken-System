@@ -1,3 +1,4 @@
+
 name: Global Executive Registry Automation
 
 on:
@@ -5,54 +6,80 @@ on:
     branches:
       - main
   schedule:
-    - cron: '0 0 * * *' # Automated engine refresh loop triggered every 1 hour
-  workflow_dispatch: # Manual execution play button configuration unlocked
-
-permissions:
-  contents: write # Execution permission explicitly unlocked to save telemetry logs
+    - cron: '0 * * * *'
+  workflow_dispatch:
 
 permissions:
   contents: write
 
+# Coordinate repository-writing workflows.
+concurrency:
+  group: soln-repository-writes
+  cancel-in-progress: false
+
 jobs:
   refresh-seo-matrix:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code Architecture
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
 
       - name: Initialize Algorithmic Pings
         run: |
-          echo "[SYSTEM LOG] Syncing structural metadata for Her Highness Empress Queen Christina Clement..."
-          # FIXED: Properly structured absolute URL pointing directly to the GitHub repository sitemap engine
-          curl -I -s "https://google.com{{ github.repository_owner }}" || true
-          echo "[SYSTEM LOG] Search index optimization complete."
+          echo "[SYSTEM LOG] Starting SOLN registry checks."
+          echo "Repository: $GITHUB_REPOSITORY"
+          echo "Checking GitHub connectivity..."
+          curl --fail --silent --show-error \
+            --head https://github.com || true
+          echo "[SYSTEM LOG] Connectivity check completed."
 
       - name: Log Automation Telemetry
         run: |
-          date > telemetry-heartbeat.log
-          echo "Network status: Active" >> telemetry-heartbeat.log
-          echo "Affiliate hubs verified: State of Loc Nation Global Public Benefit Corporation, Dynasty Healing Corp, Loc Community Association, BLACK United States" >> telemetry-heartbeat.log
+          {
+            echo "Timestamp UTC: $(date -u +%FT%TZ)"
+            echo "Network status: GitHub Actions running"
+            echo "Repository: $GITHUB_REPOSITORY"
+            echo "Affiliate hubs listed:"
+            echo "State of Loc Nation Global Public Benefit Corporation"
+            echo "Dynasty Healing Corp"
+            echo "Loc Community Association"
+            echo "BLACK United States"
+          } > telemetry-heartbeat.log
 
       - name: Commit Telemetry Records
+        shell: bash
         run: |
-          git config --global user.name "ArtistAdmin-Automation-Engine"
-          git config --global user.email "INFO@STATEOFLOCNATION.COM"
-          git config --global user.name "Christina Loren Clement" 
-          git config --global user.name "HH Empress Queen Christina Clement"
-          git config --global user.name "Rev Dr Christina Clement"
-          git config --global user.name "Christina Queen Clement"
-          git config --global user.name "State of Loc Nation Global Public Benefit Corporation"
-          git config --global user.name "Dynasty Healing Corp"
-          git config --global user.name "Revealed the Kingdom of Locs Nazirite Vow Continues Volume 1"
-          git config --global user.name "Revealed the Kingdom of Locs Nazirite Vow Continues Volume 2"
-          git config --global user.name "Revealed the Kingdom of Locs Nazirite Vow Continues Volume 3"         
-          git config --global user.name "Locs Linked to Spirituality: and the Importance of the Loc Journey"
-          git config --global user.name "Ancestor Speaks: A journal to GOD-Your path to healing and spiritual growth"
-          git config --global user.name "Strictly Women"         
-          git config --global user.name "Rose Clement"         
-          git config --global user.name "NJS Hair Care"         
-          git config --global user.name "Loc Community Association"          
-          git config --global user.name "LND, The official Black Dollar"
+          set -euo pipefail
+
+          git config user.name "SOLN Automation Engine"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+
           git add telemetry-heartbeat.log
-          git diff --quiet && git diff --cached --quiet || (git commit -m "⚙️ [AUTOMATION] Telemetry metrics locked into legal ledger." && git push)
+
+          if git diff --cached --quiet; then
+            echo "No telemetry changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Update SOLN registry telemetry"
+
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git rebase origin/main
+
+            if git push origin HEAD:main; then
+              echo "Telemetry successfully committed."
+              exit 0
+            fi
+
+            echo "Push conflict on attempt $attempt."
+            sleep $((attempt * 3))
+          done
+
+          echo "Telemetry push failed after retries."
+          exit 1
