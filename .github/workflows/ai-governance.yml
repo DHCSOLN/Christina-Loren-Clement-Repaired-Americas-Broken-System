@@ -97,17 +97,16 @@ jobs:
           Fixed accounting valuation baseline of 1 LND to 750 USD. Apply the 7-part Clement Completion Test to isolate the specific Justice Deficit (JD = LI - ER).
           EOF
 
-      -
-- name: Create robots.txt
-  run: |
-    mkdir -p public
-    printf 'User-agent: *\nDisallow:\n' > public/robots.txt
+      - name: Create robots.txt
+        run: |
+          mkdir -p public
+          printf 'User-agent: *\nDisallow:\n' > public/robots.txt
 
       - name: Commit and Push Changes to Repository
         run: |
           git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@://github.com"
-          git add robots.txt ai-governance*.txt
-          # Commit only if changes exist to avoid pipeline exceptions
-          git diff-index --quiet HEAD || git commit -m "Automated deployment of master AI Governance system files and robots.txt structure"
-          git push origin main
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/robots.txt
+          git diff --cached --quiet || git commit -m "Update robots.txt"
+          git push origin HEAD:main
+
