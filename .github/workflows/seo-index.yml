@@ -11,6 +11,9 @@ on:
 permissions:
   contents: write # Execution permission explicitly unlocked to save telemetry logs
 
+permissions:
+  contents: write
+
 jobs:
   refresh-seo-matrix:
     runs-on: ubuntu-latest
