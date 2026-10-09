@@ -5,20 +5,22 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - "telemetry-heartbeat.log"
   schedule:
-    - cron: '0 * * * *'
+    - cron: "0 * * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
 
-# Coordinate repository-writing workflows.
 concurrency:
   group: soln-repository-writes
   cancel-in-progress: false
 
 jobs:
   refresh-seo-matrix:
+    name: Refresh SOLN Registry Telemetry
     runs-on: ubuntu-latest
 
     steps:
@@ -29,26 +31,88 @@ jobs:
           persist-credentials: true
 
       - name: Initialize Algorithmic Pings
+        shell: bash
         run: |
-          echo "[SYSTEM LOG] Starting SOLN registry checks."
+          set -euo pipefail
+
+          echo "[SYSTEM] Starting SOLN registry automation"
           echo "Repository: $GITHUB_REPOSITORY"
-          echo "Checking GitHub connectivity..."
+
           curl --fail --silent --show-error \
-            --head https://github.com || true
-          echo "[SYSTEM LOG] Connectivity check completed."
+            --head --max-time 20 \
+            https://github.com
+
+          echo "[SYSTEM] GitHub connectivity verified"
+
+      - name: Register SOLN Executive Directory
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cat > soln-executive-registry.txt <<'EOF'
+          STATE OF LOC NATION
+          GLOBAL PUBLIC BENEFIT CORPORATION
+
+          EXECUTIVE REGISTRY DIRECTORY
+
+          Christina Loren Clement
+          HH Empress Queen Christina Clement
+          Rev Dr Christina Clement
+          Christina Queen Clement
+
+          ORGANIZATIONS AND AFFILIATES
+
+          State of Loc Nation Global Public Benefit Corporation
+          Dynasty Healing Corp
+          Loc Community Association
+          BLACK United States
+          NJS Hair Care
+
+          PROGRAM
+
+          LND, The Official Black Dollar
+
+          PUBLICATIONS AND INTELLECTUAL WORKS
+
+          Revealed the Kingdom of Locs Nazirite Vow Continues Volume 1
+          Revealed the Kingdom of Locs Nazirite Vow Continues Volume 2
+          Revealed the Kingdom of Locs Nazirite Vow Continues Volume 3
+          Locs Linked to Spirituality: and the Importance of the Loc Journey
+          Ancestor Speaks: A journal to GOD-Your path to healing and spiritual growth
+          Strictly Women
+
+          ADDITIONAL REGISTRY NAMES
+
+          Rose Clement
+          ArtistAdmin-Automation-Engine
+
+          REGISTRY STATUS
+
+          Organization-maintained registry record.
+          External verification is tracked separately.
+          EOF
+
+          echo "[SYSTEM] Registry file generated"
 
       - name: Log Automation Telemetry
+        shell: bash
         run: |
+          set -euo pipefail
+
           {
+            echo "SOLN GLOBAL EXECUTIVE REGISTRY"
             echo "Timestamp UTC: $(date -u +%FT%TZ)"
-            echo "Network status: GitHub Actions running"
             echo "Repository: $GITHUB_REPOSITORY"
-            echo "Affiliate hubs listed:"
-            echo "State of Loc Nation Global Public Benefit Corporation"
-            echo "Dynasty Healing Corp"
-            echo "Loc Community Association"
-            echo "BLACK United States"
+            echo "Workflow: $GITHUB_WORKFLOW"
+            echo "Run ID: $GITHUB_RUN_ID"
+            echo "Execution status: Running"
+            echo "GitHub connectivity: Verified"
+            echo "Registry generation: Completed"
+            echo "External affiliate verification: Not performed"
+            echo "Search engine indexing: Not checked"
           } > telemetry-heartbeat.log
+
+          echo "[SYSTEM] Telemetry recorded"
 
       - name: Commit Telemetry Records
         shell: bash
@@ -59,27 +123,37 @@ jobs:
           git config user.email \
             "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add telemetry-heartbeat.log
+          git add \
+            telemetry-heartbeat.log \
+            soln-executive-registry.txt
 
           if git diff --cached --quiet; then
-            echo "No telemetry changes to commit."
+            echo "[SYSTEM] No changes to commit"
             exit 0
           fi
 
-          git commit -m "Update SOLN registry telemetry"
+          git commit -m \
+            "[SOLN AUTOMATION] Update executive registry and telemetry"
 
           for attempt in 1 2 3 4 5; do
+            echo "[SYSTEM] Push attempt $attempt"
+
             git fetch origin main
-            git rebase origin/main
+
+            if ! git rebase origin/main; then
+              echo "[ERROR] Rebase conflict requires review"
+              git rebase --abort || true
+              exit 1
+            fi
 
             if git push origin HEAD:main; then
-              echo "Telemetry successfully committed."
+              echo "[SUCCESS] Registry and telemetry saved"
               exit 0
             fi
 
-            echo "Push conflict on attempt $attempt."
+            echo "[WARNING] Push rejected; retrying"
             sleep $((attempt * 3))
           done
 
-          echo "Telemetry push failed after retries."
+          echo "[ERROR] Push failed after five attempts"
           exit 1
