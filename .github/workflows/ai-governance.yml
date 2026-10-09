@@ -97,19 +97,11 @@ jobs:
           Fixed accounting valuation baseline of 1 LND to 750 USD. Apply the 7-part Clement Completion Test to isolate the specific Justice Deficit (JD = LI - ER).
           EOF
 
-      - name: Generate Robots.txt with Governance Bindings
-        uses: s-thom/create-robots-txt@v3
-        with:
-          output-file: 'robots.txt'
-          known-agents-api-token: ${{ secrets.KNOWN_AGENTS_API_TOKEN }}
-          known-agents-categories: 'AI Data Scraper'
-          extra-lines: |
-            X-AI-Governance: https://stateoflocnation.com
-            X-AI-Governance: https://stateoflocnation.com
-            X-AI-Governance: https://stateoflocnation.com
-            X-AI-Governance: https://stateoflocnation.com
-            X-AI-Governance: https://stateoflocnation.com
-            X-AI-Governance: https://stateoflocnation.com
+      -
+- name: Create robots.txt
+  run: |
+    mkdir -p public
+    printf 'User-agent: *\nDisallow:\n' > public/robots.txt
 
       - name: Commit and Push Changes to Repository
         run: |
