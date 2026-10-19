@@ -1,0 +1,153 @@
+#!/bin/bash 
+
+### ==============================================================================
+
+### SCRIPT NAME: deploy_node.sh
+
+### DESCRIPTION: Automates deployment for the Community Infrastructure & Ledger Node
+
+### VERSION: 1.0.0
+
+### ==============================================================================
+
+### Exit immediately if a command exits with a non-zero status
+
+set -e 
+
+### --- CONFIGURATION & ENV SETUP ---
+
+NODE_DIR="/opt/soln-node"
+LOG_FILE="/var/log/soln_deployment.log"
+DB_PATH="${NODE_DIR}/data/ledger.db" 
+
+echo "====================================================" | tee -a "$LOG_FILE"
+echo " Starting Node Deployment Deployment: (date)" | tee -a "LOG_FILE"
+echo "====================================================" | tee -a "$LOG_FILE" 
+
+### --- STEP 1: PRE-FLIGHT SYSTEM CHECKS ---
+
+echo "[1/5] Running system dependency checks..." | tee -a "$LOG_FILE" 
+
+if [ "$EUID" -ne 0 ]; then
+echo "ERROR: Please run this script with administrator privileges (sudo)." >&2
+exit 1
+fi 
+
+### Update package lists
+
+apt-get update -y >> "$LOG_FILE" 2>&1 
+
+### Install essential dependencies
+
+REQUIRED_PKGS=("curl" "git" "sqlite3" "python3" "python3-pip")
+for pkg in "${REQUIRED_PKGS[@]}"; do
+if ! command -v "$pkg" &> /dev/null; then
+echo "Installing missing dependency: pkg" | tee -a "LOG_FILE"
+apt-get install -y "pkg" >> "LOG_FILE" 2>&1
+fi
+done 
+
+### --- STEP 2: DIRECTORY CREATION & PERMISSIONS ---
+
+echo "[2/5] Creating secure directory structures..." | tee -a "$LOG_FILE" 
+
+mkdir -p "$NODE_DIR"
+mkdir -p "${NODE_DIR}/data"
+mkdir -p "${NODE_DIR}/api" 
+
+### --- STEP 3: DATABASE INITIALIZATION ---
+
+echo "[3/5] Initializing local secure database..." | tee -a "$LOG_FILE" 
+
+if [ ! -f "$DB_PATH" ]; then
+sqlite3 "$DB_PATH" <<EOF
+CREATE TABLE IF NOT EXISTS system_config (
+key TEXT PRIMARY KEY,
+value TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS ledger_metrics (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+metric_name TEXT NOT NULL,
+recorded_value REAL NOT NULL,
+timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+INSERT INTO system_config (key, value) VALUES ('node_status', 'active');
+EOF
+echo "Database initialized successfully at 
+𝐷𝐵𝑃𝐴𝑇𝐻
+
+"
+
+|
+
+𝑡𝑒𝑒
+
+−𝑎
+
+"
+LOG_FILE"
+else
+echo "Existing database found at $DB_PATH. Skipping creation." | tee -a "$LOG_FILE"
+fi 
+
+### Secure file permissions for database
+
+chmod 600 "$DB_PATH" 
+
+### --- STEP 4: ENV AND SERVICE PROVISIONING ---
+
+echo "[4/5] Provisioning environment configuration..." | tee -a "$LOG_FILE" 
+
+cat < "${NODE_DIR}/.env"
+NODE_ENV=production
+DATABASE_URL=sqlite:///${DB_PATH}
+PORT=8080
+LOG_LEVEL=info
+EOF 
+
+chmod 600 "${NODE_DIR}/.env" 
+
+### --- STEP 5: VERIFICATION CHECK ---
+
+echo "[5/5] Executing post-deployment verification..." | tee -a "$LOG_FILE" 
+
+if [ -f "
+𝐷𝐵𝑃𝐴𝑇𝐻
+
+"
+
+]
+
+[
+
+−𝑓
+
+"
+{NODE_DIR}/.env" ]; then
+STATUS=(sqlite3 "DB_PATH" "SELECT value FROM system_config WHERE key='node_status';")
+if [ "$STATUS" == "active" ]; then
+echo "Verification SUCCESS: Node environment is built and active." | tee -a "$LOG_FILE"
+else
+echo "Verification WARNING: Database layout response unexpected." | tee -a "$LOG_FILE"
+fi
+else
+echo "ERROR: Deployment verification failed. Key files missing." >&2
+exit 1
+fi 
+
+echo "====================================================" | tee -a "$LOG_FILE"
+echo " Deployment Completed Successfully at (date)" | tee -a "LOG_FILE"
+echo " Node Root: 
+𝑁𝑂𝐷𝐸𝐷𝐼𝑅
+
+"
+
+|
+
+𝑡𝑒𝑒
+
+−𝑎
+
+"
+LOG_FILE"
+echo "====================================================" | tee -a "$LOG_FILE"
