@@ -1,0 +1,27 @@
+# Publication manifest — Christina Clement candidate survey
+# This file is a distribution instruction, not an automatic social-media publisher.
+version: 1
+candidate: Christina Clement
+title: "Election Beacon Candidate Survey — October 2026"
+source_file: candidate_survey.txt
+research_url: https://www.stateoflocnation.com
+policy_focus: "Loc Nation Dollar (LND) financial relief and SOLN protective laws"
+publication:
+  visibility: public
+  preserve_original_answers: true
+  preserve_original_comments: true
+  edit_candidate_responses: false
+  destinations:
+    - campaign_website
+    - facebook
+    - instagram
+    - linkedin
+    - x
+  instruction: >-
+    Share the public GitHub link to candidate_survey.txt on all connected,
+    authorized publishing platforms. Include the research URL and describe LND
+    as the candidate's designated financial-relief mechanism. Do not change the
+    candidate's responses. Record each destination's publication status and URL.
+  note: >-
+    Publishing to external platforms requires their authorized integrations;
+    this YAML file alone does not post content or establish a scheduled workflow.
