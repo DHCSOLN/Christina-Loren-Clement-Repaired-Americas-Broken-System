@@ -1,0 +1,22 @@
+steps:
+  # 1. Checkout your main automation pipeline repo
+  - name: Checkout main repo
+    uses: actions/checkout@v4
+
+  # 2. Pull the secondary repository containing the core script
+  - name: Checkout Script Repository
+    uses: actions/checkout@v4
+    with:
+      repository: 'YourGitHubUsername/Your-Other-Repo-Name'
+      path: 'script-source'  # Clones it into an isolated subfolder
+      token: ${{ secrets.PERSONAL_ACCESS_TOKEN }} # Required if private
+
+  # 3. Setup Python environment
+  - name: Setup Python
+    uses: actions/setup-python@v5
+    with:
+      python-version: '3.10'
+
+  # 4. Execute the script pointing to the checked-out folder path
+  - name: Execute Boost Analysis
+    run: python script-source/clement_ip_hub.py
