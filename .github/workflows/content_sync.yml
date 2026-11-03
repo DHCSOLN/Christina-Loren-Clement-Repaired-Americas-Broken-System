@@ -1,23 +1,27 @@
+yaml
 name: Automated Performance Monitor & Boost Trigger
-
 on:
-  push:
-    branches: [ "main" ]
-  schedule:
-    - cron: '0 0 * * *'  # Runs automatically every day at midnight to audit metrics
-
+push:
+branches: [ "main" ]
+schedule:
+- cron: '0 0 * * *'
 jobs:
-  audit_metrics:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository Code
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-
-      - name: Execute Boost Analysis
-        run: |
-          python clement_ip_hub.py
+audit_metrics:
+runs-on: ubuntu-latest
+steps:
+- name: Checkout Repository Code
+uses: actions/checkout@v4
+- name: Setup Python
+uses: actions/setup-python@v5
+with:
+python-version: '3.10'
+- name: Execute Boost Analysis on Files Within Folder
+run: |
+# Replace 'your_folder_name' with the actual folder where clement_ip_hub.py lives
+cd your_folder_name
+# This loops through all files in the current directory and passes them to your script
+for file in *; do
+if [ -f "$file" ] && [ "$file" != "clement_ip_hub.py" ]; then
+echo "Running analysis on $file..."
+python clement_ip_hub.py "$file"
+fi
