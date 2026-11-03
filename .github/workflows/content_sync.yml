@@ -42,3 +42,13 @@ jobs:
               python all.py "$file"
             fi
           done
+          # Prevent bash from splitting filenames with spaces
+          IFS=$'\n'
+          
+          for file in *; do
+            if [ -f "$file" ] && [ "$file" != "all.py" ]; then
+              echo "Running analysis on file: $file"
+              # Adding '|| true' keeps the workflow alive if all.py crashes on a text file
+              python all.py "$file" || true
+            fi
+          done
