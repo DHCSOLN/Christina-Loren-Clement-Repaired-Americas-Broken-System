@@ -19,11 +19,11 @@ jobs:
 
       - name: Execute Boost Analysis on Files
         run: |
-          # Finds clement_ip_hub.py anywhere in the repo and loops through neighboring files
-          SCRIPT_PATH=$(find . -name "clement_ip_hub.py" -print -quit)
+          # Finds all.py anywhere in the repo and loops through neighboring files safely
+          SCRIPT_PATH=$(find . -name "all.py" -print -quit)
           
           if [ -z "$SCRIPT_PATH" ]; then
-            echo "Error: clement_ip_hub.py not found anywhere in the repository."
+            echo "Error: all.py not found anywhere in the repository."
             exit 1
           fi
           
@@ -31,9 +31,14 @@ jobs:
           echo "Found script in directory: $SCRIPT_DIR"
           
           cd "$SCRIPT_DIR"
+          
+          # Prevent bash from splitting filenames with spaces into multiple arguments
+          IFS=$'\n'
+          
           for file in *; do
-            if [ -f "$file" ] && [ "$file" != "clement_ip_hub.py" ]; then
-              echo "Running analysis on $file..."
-              python clement_ip_hub.py "$file"
+            if [ -f "$file" ] && [ "$file" != "all.py" ]; then
+              echo "Running analysis on file: $file"
+              # Double quotes around "$file" ensure the name stays grouped as a single argument
+              python all.py "$file"
             fi
           done
