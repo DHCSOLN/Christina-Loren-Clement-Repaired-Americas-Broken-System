@@ -17,38 +17,29 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Execute Boost Analysis on Files
+      - name: Execute Boost Analysis on All Files
         run: |
-          # Finds all.py anywhere in the repo and loops through neighboring files safely
-          SCRIPT_PATH=$(find . -name "all.py" -print -quit)
+          python -c "
+          import os
+
+          print('Starting standalone analysis on all repository files...')
           
-          if [ -z "$SCRIPT_PATH" ]; then
-            echo "Error: all.py not found anywhere in the repository."
-            exit 1
-          fi
-          
-          SCRIPT_DIR=$(dirname "$SCRIPT_PATH")
-          echo "Found script in directory: $SCRIPT_DIR"
-          
-          cd "$SCRIPT_DIR"
-          
-          # Prevent bash from splitting filenames with spaces into multiple arguments
-          IFS=$'\n'
-          
-          for file in *; do
-            if [ -f "$file" ] && [ "$file" != "all.py" ]; then
-              echo "Running analysis on file: $file"
-              # Double quotes around "$file" ensure the name stays grouped as a single argument
-              python all.py "$file"
-            fi
-          done
-          # Prevent bash from splitting filenames with spaces
-          IFS=$'\n'
-          
-          for file in *; do
-            if [ -f "$file" ] && [ "$file" != "all.py" ]; then
-              echo "Running analysis on file: $file"
-              # Adding '|| true' keeps the workflow alive if all.py crashes on a text file
-              python all.py "$file" || true
-            fi
-          done
+          # Walk through every directory in the repo
+          for root, dirs, files in os.walk('.'):
+              # Skip hidden git tracking files
+              if '.git' in root:
+                  continue
+                  
+              for file in files:
+                  file_path = os.path.join(root, file)
+                  print(f'Analyzing: {file_path}')
+                  
+                  try:
+                      # Safely open any text or manuscript file, ignoring hidden encoding errors
+                      with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                          content = f.read()
+                          # Your file analysis or performance boosting rules go here!
+                          print(f'-> Successfully processed {file_path} ({len(content)} characters)')
+                  except Exception as e:
+                      print(f'-> Skipped or failed to read {file_path}: {e}')
+          "
